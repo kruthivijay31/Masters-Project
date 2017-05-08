@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Box office success predictor, predicts the success of the movies before release, Analytics page">
+        <meta name="author" content="Kruthi Venkatesh">
+        <title><%= title %></title>
+        <!--[if lt IE 9]
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+            <![end if]-->
+        <link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="stylesheets/movie_maker_dash.css">
+        <link rel="stylesheet" type="text/css" href="stylesheets/sticky_footer.css">
+
+    </head>
+    <body>
+        <div ng-app="analyticsApp" ng-controller="analyticsController">
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <label class="brand_label brand">Box Office Success Predictor</label>
+                    </div>
+                    <div id="navbar" class="navbar-collapse collapse">
+                        <div class="navbar-right">
+                            <ul class="ul_style">
+                                <li><a href="/" class="link_style">Register</a></li>
+                                <li><a href="/login" class="link_style">Login</a></li>
+                                <li><a href="/userDashBoard" class="link_style">User Dashboard</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <div class="container">
+                <div class="row">
+                    <div class="labelStart text-center">
+                        <label><h1>Movie: <span class="alertColor">{{movie_name}}</span></h1></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <label><h3>Facebook Reaction Pie Chart</h3></label>
+                    <div id="analyticsContainerFb"></div>
+                </div>
+                <div class="row">
+                    <label><h3>YouTube Pie Chart</h3></label>
+                    <div id="analyticsContainerYoutube"></div>
+                </div>
+                <div class="row">
+                    <label><h3>User Votes</h3></label>
+                    <div id="analyticsContainerUserVote"></div>
+                </div>
+            </div>
+            <footer class="footer">
+                <div class="container">
+                    <div class="bottom-footer">
+                        <ul class="footer-nav">
+                            <li>Box Office © 2016</li>
+                            <li><a href="/userDashBoard">User Dashboard</a></li>
+                            <li><a href="/">Register</a></li>
+                            <li><a href="/login">Login</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </footer>   
+        </div>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+        <script type="text/javascript">
+            angular.module('analyticsApp', [])
+                .controller('analyticsController', function($scope, $http) {
+                    var layout = {
+                        height: 780,
+                        width: 1180
+                    };
+                    var fbArr = [];
+                    var fbData = {};
+                    var youTubeArr = [];
+                    var youTubeData = {};
+                    var userVoteArr = [];
+                    var userVoteData = {};
+                    function getFbReaction(){
+                        $http({
+                            method: 'get',
+                            url: '/getFbReaction'
+                        }).success(function(response){
+                            if(response.returnstatus == "error"){
+                                $scope.movie_name = "Error while getting the page, please try again";
+                            } else if(response.doc.length !== 0){
+                                //console.log(response.doc);
+                                createDataFb(response.doc[0]);
+                                $scope.movie_name = response.doc[0].movieName;
+                                Plotly.newPlot('analyticsContainerFb', fbArr, layout);
+                                //createFbChart(response.doc);
+                            }else{
+                                $scope.movie_name = "Movie is not present in database";
+                                document.getElementById("analyticsContainerFb").innerHTML = "No data found";
+                            }
+                        }).error(function(error){
+                          console.log(error);
+                        });
+                    };
+                    getFbReaction();
+
+                    function getYoutubeData(){
+                        $http({
+                            method: 'get',
+                            url: '/getYoutubeData'
+                        }).success(function(response){
+                            if(response.returnstatus == "error"){
+                                $scope.movie_name = "Error while getting the page, please try again";
+                            } else if(response.doc.length !== 0){
+                                console.log(response.doc);
+                                createDataYouTube(response.doc[0].statistics);
+                                Plotly.newPlot('analyticsContainerYoutube', youTubeArr, layout);
+                                //createFbChart(response.doc);
+                            }else{
+                                document.getElementById("analyticsContainerYoutube").innerHTML = "No data found";
+                            }
+                        }).error(function(error){
+                          console.log(error);
+                        });
+                    };
+                    getYoutubeData();
+
+
+                    function createDataFb(data){
+                        var valueArr = [data.angry, data.haha, data.like, data.love, data.sad, data.wow];
+                        var labelArr = ["angry", "haha", "like", "love", "sad", "wow"];
+                        fbData.values = valueArr;
+                        fbData.labels = labelArr;
+                        fbData.type ='pie';
+                        fbArr.push(fbData);
+                    }
+
+                    function createDataYouTube(data){
+                        var valueArr = [data.commentCount, data.dislikeCount, data.favoriteCount, data.likeCount, data.viewCount];
+                        var labelArr = ["commentCount", "dislikeCount", "favoriteCount", "likeCount", "viewCount"];
+                        youTubeData.values = valueArr;
+                        youTubeData.labels = labelArr;
+                        youTubeData.type ='pie';
+                        youTubeArr.push(youTubeData);
+                    }
+
+                    function getUserVote(){
+                        $http({
+                            method: 'get',
+                            url: '/getUserVote'
+                        }).success(function(response){
+                            if(response.returnstatus == "error"){
+                                $scope.movie_name = "Error while getting the page, please try again";
+                            } else if(response.doc.length === 0){
+                                document.getElementById("analyticsContainerUserVote").innerHTML = "No data found";
+                            }else{
+                                console.log(response.doc[0]);
+                                createDataUserVotes(response.doc[0]);
+                                Plotly.newPlot('analyticsContainerUserVote', userVoteArr, layout);
+                                //createFbChart(response.doc);
+                            }
+                        }).error(function(error){
+                          console.log(error);
+                        });
+                    };
+
+                    function createDataUserVotes(data){
+                        console.log(data.Yes);
+                        var valueArr = [data.Yes, data.No];
+                        var labelArr = ["Yes", "No"];
+                        userVoteData.values = valueArr;
+                        userVoteData.labels = labelArr;
+                        userVoteData.type ='pie';
+                        userVoteArr.push(userVoteData);
+                    }
+                    getUserVote();
+
+                    /*function createFbChart(data){
+                        var svg = dimple.newSvg("#analyticsContainer", 590, 400);
+                        var myChart = new dimple.chart(svg, data);
+                        myChart.setBounds(20, 20, 360, 360)
+                        myChart.addMeasureAxis("p", "love");
+                        var ring = myChart.addSeries("Owner", dimple.plot.pie);
+                          ring.innerRadius = "50%";
+                          myChart.addLegend(500, 20, 90, 300, "left");
+                          myChart.draw();
+                    }*/
+                });
+        </script>
+    </body>
+</html>
+
+</div>
+</html>

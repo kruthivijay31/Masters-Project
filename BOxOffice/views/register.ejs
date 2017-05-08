@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Box office success predictor, predicts the success of the movies before release, movie maker registration page">
+	<meta name="author" content="Kruthi Venkatesh">
+	<title><%= title %></title>
+	<!--[if lt IE 9]
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+    <![end if]-->
+	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="stylesheets/sticky_footer.css">
+</head>
+<body>
+	<div ng-app="regApp" ng-controller="registerController">
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<label class="brand_label">Box Office Success Predictor</label>
+				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<form class="navbar-form navbar-right" name="loginForm">
+						<div class="form-group">
+							<input class="form-control" type="email" placeholder="Enter Email Id" id="email" ng-model="login_email"required>
+						</div>
+						<div class="form-group">
+							<input class="form-control" type="password" minlength="6" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$" placeholder="Enter Password" id="pwd" ng-model="login_pwd" required>
+						</div>
+						<button type="submit" class="btn btn-success" ng-click="login()" ng-disabled="loginForm.$invalid">Sign in</button>
+						<div class="form-group alertColor">
+							<label>{{errorMsgLogin}}</label>
+						</div>
+					</form>
+				</div><!--/.navbar-collapse -->
+			</div>
+		</nav>
+		<div class="container">
+			<div class="row">
+				<div class="text-center">
+					<h2 class="page-title"><strong><p>Check the movie success prediction, movie goers opinion, much more!!</p></strong></h2>
+				</div>
+			</div>
+			<div class="row">
+				<div class="text-center">
+					<h3 style="color:black"><strong>Get Started - it's free.</strong></h3>
+					<h5 style="margin-bottom:30px;">Registration takes less than 2 minutes</h5>
+				</div>
+				<div class="col-md-4">
+					<img src="images/movie_collage.jpg" class="img-responsive" style="height:400px;width:1200px;" alt="bg">
+				</div>
+				<div class="col-md-8">
+					<form name="regForm"> 
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group row">
+									<label for="movieTitle" class="col-md-3 col-form-label">Movie<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Movie Name" id="movieTitle" ng-model="movie_name" name="movie_name" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="movieYear" class="col-md-3 col-form-label">Year<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="number" min="2000" placeholder="Enter Year of Release" id="movieYear" ng-model="movie_year" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="movieMonth" class="col-md-3 col-form-label">Month<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="number" min="1" max="12" placeholder="Enter Month of Release" id="movieMonth" ng-model="movie_month" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="movieSummary" class="col-md-3 col-form-label">Summary<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<textarea class="form-control" rows="2" placeholder="Enter Movie Overview" id="movieSummary" ng-model="movie_summary" required></textarea>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="movieGenre" class="col-md-3 col-form-label">Genre<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Genre" id="movieGenre" ng-model="movie_genre" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="actor1" class="col-md-3 col-form-label">Actor 1<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor1" ng-model="movie_actor1" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="actor2" class="col-md-3 col-form-label">Actor 2</label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor2" ng-model="movie_actor2" >
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="actor3" class="col-md-3 col-form-label">Actor 3</label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor3" ng-model="movie_actor3" >
+									</div>
+								</div>
+							</div>
+
+
+							<div class="col-md-6">	
+								
+								<div class="form-group row">
+									<label for="dir" class="col-md-3 col-form-label">Director<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Director Name" id="dir" ng-model="movie_director" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="prod" class="col-md-3 col-form-label">Producer</label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Producer Name" id="prod" ng-model="movie_producer" >
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="movieBudget" class="col-md-3 col-form-label">Budget<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="number" min="10000" placeholder="Enter Budget in $" id="movieBudget" ng-model="movie_budget" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="language" class="col-md-3 col-form-label">Language<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Language" id="language" ng-model="movie_language" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="poster_path" class="col-md-3 col-form-label">Poster Path<span class="alertColor asterisk">*</span></label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Poster link" id="poster_path" ng-model="movie_poster" required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="trailer_path" class="col-md-3 col-form-label">Trailer Path</label>
+									<div class="col-md-9">
+										<input class="form-control" type="text" placeholder="Enter Trailer link" id="trailer_path" ng-model="movie_trailer">
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="emailId" class="col-md-3 col-form-label">Email</label>
+									<div class="col-md-9">
+										<input class="form-control" type="email" placeholder="Enter Email Id" id="emailId" ng-model="movie_email"required>
+									</div>
+								</div>
+								<div class="form-group row">
+									<label for="pwdId" class="col-md-3 col-form-label">Password</label>
+									<div class="col-md-9">
+										<input class="form-control" type="password" minlength="6" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$" placeholder="Enter Password" id="pwdId" ng-model="movie_pwd" required>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="text-center">
+								<button type="submit" class="btn btn-primary" ng-click="register()" ng-disabled="regForm.$invalid" id="reg">
+									<span class="glyphicon glyphicon-user"></span>Register</button>
+								<button class="btn btn-danger" ng-click="cancel()"> 
+									<span class="glyphicon glyphicon-remove"></span>Cancel</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="alertColor text-center">
+								<label>{{errorMsg}}</label>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<footer class="footer">
+			<div class="container">
+				<div class="bottom-footer">
+					<ul class="footer-nav">
+						<li>Box Office © 2016</li>
+						<li><a href="/userDashBoard">User Dashboard</a></li>
+						<li><a href="/login">Login</a></li>
+					</ul>
+				</div>
+			</div>
+		</footer>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+	<script type="text/javascript" src="bootstrap3/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+
+		angular.module('regApp', [])
+  			.controller('registerController', function($scope, $http) {
+  				$scope.register = function(){
+  					console.log("Registration");
+  					var data = {
+  						movie: $scope.movie_name,
+  						year: $scope.movie_year,
+  						month: $scope.movie_month,
+  						summary: $scope.movie_summary,
+  						genre: $scope.movie_genre,
+  						actor1: $scope.movie_actor1,
+  						actor2: $scope.movie_actor2,
+  						actor3: $scope.movie_actor3,
+  						director: $scope.movie_director,
+  						producer: $scope.movie_producer,
+  						budget: $scope.movie_budget,
+  						language: $scope.movie_language,
+  						poster: $scope.movie_poster,
+  						trailerLink: $scope.movie_trailer,
+  						email: $scope.movie_email.toLowerCase(),
+  						password: $scope.movie_pwd
+  					};
+  					$http({
+                		method: 'POST',
+                		url: '/savemovie',
+                		data: data
+                	}).success(function(response){
+                		if(response.regstatus === "error"){
+                			$scope.errorMsg = response.errors;
+                		}
+                		else if(response.regstatus === "userExists"){
+                			$scope.errorMsg = "User already registered, Please login";
+                		}
+                		else{
+                			$scope.cancel();
+                			window.location =  '/getMovieMakerDashboard'; 
+                		}
+                	}).error(function(error){
+                		console.log(error);
+                	});	
+  				}
+
+  				$scope.login = function(){
+  					console.log("Login");
+  					var data = {
+  						email: $scope.login_email.toLowerCase(),
+  						password: $scope.login_pwd
+  					};
+  					$http({
+                		method: 'POST',
+                		url: '/afterLogin',
+                		data: data
+                	}).success(function(response){
+						if(response.loginstatus == "incorrectemail"){
+							$scope.errorMsgLogin = "Invalid Email Id";
+							$scope.login_email = "";
+						}
+						else if(response.loginstatus == "incorrectPassword"){
+							$scope.errorMsgLogin = "Invalid Password";
+							$scope.login_pwd = "";
+						}
+						else if(response.loginstatus == "error"){
+							$scope.errorMsgLogin = response.errors;
+							$scope.resetLogin();
+						}
+						else{
+							$scope.resetLogin();
+                			window.location = '/getMovieMakerDashboard'; 
+						}
+                	}).error(function(error){
+                		console.log(error);
+                	});	
+  				}
+
+  				$scope.cancel = function(){
+  					$scope.movie_name = "";
+					$scope.movie_year = "";
+					$scope.movie_month = "";
+					$scope.movie_summary = "";
+					$scope.movie_genre = "";
+					$scope.movie_actor1 = "";
+					$scope.movie_actor2 = "";
+					$scope.movie_actor3 = "";
+					$scope.movie_director = "";
+					$scope.movie_producer = "";
+					$scope.movie_budget = "";
+					$scope.movie_language = "";
+  					$scope.movie_poster = "";
+  					$scope.movie_trailer = "";	
+					$scope.movie_email = "";
+					$scope.movie_pwd = "";
+  				}
+
+  				$scope.resetLogin = function(){
+  					$scope.errorMsg = "";
+					$scope.login_email = "";
+					$scope.login_pwd = "";
+  				}
+  			}
+  		);
+	</script>
+
+</body>
+</html>

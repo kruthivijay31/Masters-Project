@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html class="fullpage">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="This website is box office success predictor and this page is used for movie maker login">
+		<meta name="author" content="Kruthi Venkatesh">
+		<title><%= title %></title>
+		<!--[if lt IE 9]
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <![end if]-->
+		<link rel="stylesheet" type="text/css" href="stylesheets/login.css">
+		<link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="stylesheets/sticky_footer.css">
+	</head>
+	<body>
+		<div ng-app="loginApp" ng-controller="loginController">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-3 col-md-13 col-sm-12 col-xs-12">
+						<div class="row rowBgColor">
+							<div class="text-center textColor">
+								<h2>Box Office Success Predictor</h2>
+							</div>
+						</div>
+						<div class="row">
+							<div class="positionForm">
+								<form name="loginForm">
+									<div class="form-group row">
+										<label for="emailId" class="col-md-3 col-form-label">Email</label>
+										<div class="col-md-9">
+											<input class="form-control" type="email" placeholder="Enter Email Id" id="emailId" ng-model="movie_email"required>
+										</div>
+									</div>
+									<div class="form-group row">
+										<label for="pwdId" class="col-md-3 col-form-label">Password</label>
+										<div class="col-md-9">
+											<input class="form-control" type="password" minlength="6" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$" placeholder="Enter Password" id="pwdId" ng-model="movie_pwd" required>
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="alertColor text-center">
+											<label>{{errorMsg}}</label>
+										</div>
+									</div>
+									<div class="row">
+										<div class="text-center">
+											<button type="submit" class="btn btn-primary btn-lg" ng-click="login()" ng-disabled="loginForm.$invalid" id="reg">
+												<span class="glyphicon glyphicon-user"></span>Login</button>
+											<button class="btn btn-danger btn-lg" ng-click="cancel()"> 
+												<span class="glyphicon glyphicon-remove"></span>Cancel</button>
+										</div>
+									</div>
+									<div class="row">
+										<div class="text-center">
+											<p>Not a Member? <a href="/">Join Now</a></p>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<footer class="footer">
+				<div class="container">
+					<div class="bottom-footer">
+						<ul class="footer-nav">
+							<li>Box Office © 2016</li>
+							<li><a href="/userDashBoard">User Dashboard</a></li>
+						</ul>
+					</div>
+				</div>
+			</footer>
+		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+		<script type="text/javascript" src="bootstrap3/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			angular.module('loginApp', [])
+	  			.controller('loginController', function($scope, $http) {
+	  				$scope.login = function(){
+	  					console.log("Login");
+	  					var data = {
+	  						email: $scope.movie_email.toLowerCase(),
+	  						password: $scope.movie_pwd
+	  					};
+	  					$http({
+	                		method: 'POST',
+	                		url: '/afterLogin',
+	                		data: data
+	                	}).success(function(response){
+							if(response.loginstatus == "incorrectemail"){
+								$scope.errorMsg = "Invalid Email Id";
+								$scope.movie_email = "";
+							}
+							else if(response.loginstatus == "incorrectPassword"){
+								$scope.errorMsg = "Invalid Password";
+								$scope.movie_pwd = "";
+							}
+							else if(response.loginstatus == "error"){
+								$scope.errorMsg = response.errors;
+								$scope.cancel();
+							}
+							else{
+								$scope.cancel();
+	                			window.location = '/getMovieMakerDashboard'; 
+							}
+	                	}).error(function(error){
+	                		console.log(error);
+	                	});	
+	  				}
+	  				$scope.cancel = function(){
+						$scope.movie_email = "";
+						$scope.movie_pwd = "";
+						$scope.errorMsg = ""
+	  				}
+	  			});
+	  	</script>
+	</body>
+</html>

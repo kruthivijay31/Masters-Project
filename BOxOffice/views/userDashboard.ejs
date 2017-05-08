@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="Box office success predictor, predicts the success of the movies before release, user dashboard page">
+		<meta name="author" content="Kruthi Venkatesh">
+		<title><%= title %></title>
+		<!--[if lt IE 9]
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <![end if]-->
+		<link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="stylesheets/sticky_footer.css">
+		<link rel="stylesheet" type="text/css" href="stylesheets/movie_maker_dash.css">
+	</head>
+	<body>
+		<div ng-app="userApp" ng-controller="userController">
+			<nav class="navbar navbar-inverse navbar-fixed-top">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<label class="brand_label" style="margin-top:10px;">Box Office Success Predictor</label>
+					</div>
+					<div id="navbar" class="navbar-collapse collapse">
+						<div class="navbar-right">
+							<ul class="ul_style">
+								<li><a href="/" class="link_style">Register</a></li>
+								<li><a href="/login" class="link_style">Login</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</nav>
+			<div class="container options">
+				<div class="pull-right">
+					<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#findMovie"><span class="glyphicon glyphicon-search"></span>Find Movies</button>
+					<button class="btn btn-danger btn-lg" ng-click="reset()"><span class="glyphicon glyphicon-delete"></span>Reset</button>
+				</div>
+			</div>
+			<!-- Modal -->
+			<div id="trailerModal" class="modal fade" role="dialog">
+			  	<div class="modal-dialog">
+			    	<!-- Modal content-->
+			    	<div class="modal-content">
+				      	<div class="modal-header">
+				        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+				        	<h1 class="modal-title alertColor text-center">Watch Trailer</h1>
+				      	</div>
+				      	<div class="modal-body">
+				      		 <iframe id="trailerVideo" width="560" height="315" ng-src="{{trustSrc()}}" frameborder="0" allowfullscreen></iframe>
+				      	</div>
+			    	</div>
+			  	</div>
+			</div>
+			<div id="findMovie" class="modal fade" role="dialog">
+			  	<div class="modal-dialog">
+			    	<!-- Modal content-->
+			    	<div class="modal-content">
+				      	<div class="modal-header">
+				        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+				        	<h1 class="modal-title alertColor text-center">Find Movies</h1>
+				      	</div>
+				      	<div class="modal-body">
+				      		<form name="findMovieForm"> 
+								<div class="row">
+									<div class="form-group">
+										<div class="col-md-2">
+											<label for="movieTitle" class="col-md-3 col-form-label">Movie<span class="alertColor asterisk">*</span></label>
+										</div>
+										<div class="col-md-10">
+											<input class="form-control" type="text" placeholder="Enter Movie Name" id="movieTitleFind" ng-model="movie_name" name="movie_name" required>
+										</div>
+									</div>
+								</div>
+							</form>
+				      	</div>
+				      	<div class="modal-footer">
+				        	<button type="button" ng-click="findMovie()" class="btn btn-primary" ng-disabled="findMovieForm.$invalid">
+				        		<span class="glyphicon glyphicon-save"></span>Submit</button>
+							<button type="button" class="btn btn-danger" ng-click="clearFind()">
+								<span class="glyphicon glyphicon-remove"></span>Clear</button>
+				      	</div>
+			    	</div>
+			  	</div>
+			</div>
+			<div class="container dash">
+				<section>
+					<div class="alertColor text-center asterisk">
+						<label>{{norecord}}</label>
+					</div>
+					<table class="table">
+						<tbody>
+							<tr ng-repeat="movie in movies">
+								<td class="col-md-3">
+									<div class="image">
+										<img height="320" width="210" alt="{{movie.title}}" title="{{movie.title + movie.release_date}}" ng-src="http://image.tmdb.org/t/p/w185/{{movie.poster_path}}">
+									</div>
+								</td>
+								<td class="col-md-9">
+									<div class="row nameStyle">
+										<label>
+											<h1>{{movie.title}}</h1>
+										</label>
+										<a href="#trailerModal" class="btn btn-lg btn-info pull-right btn-style" data-toggle="modal" ng-disabled="movie.trailerLink.length === 0" ng-click="trailer(movie.trailerLink)"><span class="glyphicon glyphicon-film" ></span>&nbsp;Trailer</a>
+										<button class="btn btn-warning btn-lg pull-right btn-style" ng-click="getAnalytics(movie.title)"><span class="glyphicon glyphicon-eye-open"></span>&nbsp; Analytics</button>
+									</div>
+									<div class="row paraStyle">
+										<label>
+											<h4><em>{{getGenreById(movie.genre_ids)}}</em></h4>
+										</label>
+									</div>
+									<div class="row summaryStyle">
+										<p>{{movie.overview}}</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Language : </strong>
+											<span class="summaryStyle">{{movie.original_language == "en" ? "English" : movie.original_language}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Release Date : </strong>
+											<span class="summaryStyle">{{movie.release_date}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Success Prediction : </strong>
+											<span class="summaryStyle">Hit</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Would you like to watch this movie : </strong>
+											<input type="radio" name="interest" value="yes" ng-click="updateYes(movie.title)"><label for="yes"> Yes</label>
+											<input type="radio" name="interest" value="no" ng-click="updateNo(movie.title)"><label for="no"> No</label>
+										</p>
+									</div>
+								</td>
+								<!--<td class="col-md-9">
+									<div class="row nameStyle">
+										<label>
+											<h1>{{movie.movie_title}} ({{movie.title_year}})</h1>
+										</label>
+									</div>
+									<div class="row genreStyle">
+										<label>
+											<h4><em>{{movie.Genre1 ? check(movie.Genre1):''}}</em></h4>
+										</label>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Director : </strong>
+											<span class="summaryStyle">{{movie.director_name}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Stars : </strong>
+											<span class="summaryStyle">{{movie.actor_1_name}}, {{movie.actor_2_name}}, {{movie.actor_3_name}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Language : </strong>
+											<span class="summaryStyle">{{movie.language}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Budget : </strong>
+											<span class="summaryStyle">${{movie.budget}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Duration : </strong>
+											<span class="summaryStyle">{{movie.duration}} minutes</span>
+										</p>
+									</div>
+								</td>-->
+							</tr>
+						</tbody>
+					</table>
+				</section>
+			</div>
+			<footer class="footer">
+				<div class="container">
+					<div class="bottom-footer">
+						<ul class="footer-nav">
+							<li>Box Office © 2016</li>
+							<li><a href="/">Register</a></li>
+							<li><a href="/login">Login</a></li>
+						</ul>
+					</div>
+				</div>
+			</footer>
+		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+		<script type="text/javascript" src="bootstrap3/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			angular.module('userApp', [])
+	  			.controller('userController', function($scope, $http,  $sce) {
+	  				var url = "";
+	  				function loadPage(){
+	  					$http({
+	                		method: 'get',
+	                		url: '/getmovieDataForUser'
+	                	}).success(function(response){
+	                		if(response.returnstatus == "error"){
+	                			$scope.errorMsg = response.errors;
+	                		}
+	                		else if(response.returnstatus == "nodata")
+	                		{
+	                			$scope.errorMsg = "No movies found in the database";
+	                		}
+	                		else{
+	                			$scope.movies = response;
+	                		}
+	                	}).error(function(error){
+	                		console.log(error);
+	                	});
+		  			}
+		  			
+
+		  			function getGenre(){
+		  				$http({
+		  					method: 'GET',
+		  					url: '/getGenre',
+		  				}).success(function(response){
+		  					if(response.returnstatus == "error"){
+		  						console.log(response.errors);
+		  					}
+		  					else if(response.returnstatus == "nodata"){
+		  						console.log("No Genre found");
+		  					}
+		  					else{
+		  						$scope.genreName = response[0];
+		  						console.log($scope.genreName);
+		  					}
+		  				}).error(function(error){
+		  					console.log(error);
+		  				});
+		  			}
+
+		  			loadPage();
+		  			getGenre();
+
+		  			$scope.getGenreById = function(genre_ids){
+		  				var genre = [];
+		  				var genreList = $scope.genreName.genres;
+		  				for(var j=0; j<genre_ids.length;j++){
+			  				for(var i = 0; i < genreList.length; i++){
+			  					if(genre_ids[j] == genreList[i].id){
+			  						genre.push(genreList[i].name);
+			  					}
+			  				}
+			  			}
+			  			return genre.join(' | ');
+		  			}
+
+		  			$scope.trailer = function(trailerLink){
+		  				$scope.trailerSrc = "http://www.youtube.com/embed/" + getYoutubeId(trailerLink[0]);
+		  				//console.log($scope.trailerSrc);
+		  			} 
+
+		  			$scope.trustSrc = function() {
+		  				//console.log($scope.trailerSrc);
+					    return $sce.trustAsResourceUrl($scope.trailerSrc);
+					}
+
+			  		$("#trailerModal").on('hide.bs.modal', function(){
+						$("#trailerVideo").attr('src', '');
+					});
+					$("#trailerModal").on('show.bs.modal', function(){
+					    $("#trailerVideo").attr('src', $scope.trailerSrc);
+					});
+
+					$("#findMovie").on('show.bs.modal', function(){
+					    $('#movieTitleFind').focus()
+					});
+
+					function getYoutubeId(link){
+						var index = link.indexOf('=');
+						return link.slice(index+1);
+					}
+
+					$scope.clearFind = function(){
+						$scope.movie_name = "";
+					}
+
+					$scope.findMovie = function(){
+						$http.get('/findMovieByName/' + $scope.movie_name).success(function(response){
+							console.log(response);
+							console.log(response.doc.length);
+							if(response.returnstatus == "error"){
+		  						console.log(response.errors);
+		  					}else if(response.doc.length === 0){
+		  						$scope.norecord = "No records found";
+		  						$scope.clearFind();
+	                			$('#findMovie').modal('hide');
+		  						$scope.movies = response.doc;
+		  					}else{
+		  						$scope.clearFind();
+		  						$scope.norecord = "";
+	                			$('#findMovie').modal('hide');
+	                			$scope.movies = response.doc;
+	                		}
+						}).error(function(error){
+		  					console.log(error);
+		  				});
+					}
+
+					$scope.reset = function(){
+						loadPage();
+						getGenre();
+						$scope.norecord = "";
+					}
+
+					$scope.getAnalytics = function(movieName){
+						$http.get('/getAnalyticsByName/' + movieName).success(function(response){
+							if(response.resp == "success"){
+		  						window.location = '/analytics';
+		  					} else{
+		  						console.log("error");
+		  					}
+						}).error(function(error){
+		  					console.log(error);
+		  				});
+					}
+
+					$scope.updateYes = function(movieName){
+						$http.get('/updateYes/' + movieName).success(function(response){
+							if(response.returnstatus == "error"){
+		  						console.log("Error " + response.errors);
+		  					} else{
+		  						console.log(response.doc);
+		  					}
+						}).error(function(error){
+		  					console.log(error);
+		  				});
+					}
+
+					$scope.updateNo = function(movieName){
+						$http.get('/updateNo/' + movieName).success(function(response){
+							if(response.returnstatus == "error"){
+		  						console.log("Error " + response.errors);
+		  					} else{
+		  						console.log(response.doc);
+		  					}
+						}).error(function(error){
+		  					console.log(error);
+		  				});
+					}
+
+		  			/*$scope.getImdbData = function(title, release_date){
+		  				console.log("Inside");
+		  				var data = {
+		  					title : title,
+		  					release_date : release_date
+		  				};
+		  				$http({
+		  					method: 'POST',
+		  					url: '/getImdbData',
+		  					data: data
+		  				}).success(function(response){
+		  					if(response.returnstatus == "error"){
+		  						console.log(error);
+		  					}
+		  					else if(response.returnstatus == "nodata"){
+		  						console.log("No data found");
+		  					}
+		  					else{
+		  						$scope.imdbMovie = response[0];
+		  						console.log($scope.imdbMovie);
+		  					}
+		  				}).error(function(error){
+		  					console.log(error);
+		  				})
+		  			}*/
+
+		  		});
+		</script>
+	</body>
+</html>

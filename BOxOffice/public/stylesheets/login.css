@@ -1,0 +1,52 @@
+.fullpage {
+    background: url('../images/movie_collage.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.col-lg-3.col-md-13.col-sm-12.col-xs-12{
+    position:absolute;
+    top:200px;
+    left:400px;
+    width: 450px;
+    height:330px;
+    background-color: White;
+}
+
+.container{
+    position:relative;
+}
+
+.button_signin
+{
+  margin-left:50px;
+  margin-top:10px;
+  margin-bottom:20px;
+  width: 300px;
+}
+
+.positionForm{
+	margin-top:40px;
+	margin-left:20px;
+	margin-right:20px;
+}
+
+.rowBgColor{
+	background-color: black;
+}
+
+.textColor{
+	color:white;
+	font-size:20px;
+	font-family:"Comic Sans MS", cursive, sans-serif
+}
+
+.alertColor{
+	margin:0px;
+	padding-left:60px;
+	padding-top:0px;
+	padding-bottom:10px;
+	color: red;
+}

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="Box office success predictor, predicts the success of the movies before release, movie maker dashboard page">
+		<meta name="author" content="Kruthi Venkatesh">
+		<title><%= title %></title>
+		<!--[if lt IE 9]
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <![end if]-->
+		<link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="stylesheets/sticky_footer.css">
+		<link rel="stylesheet" type="text/css" href="stylesheets/movie_maker_dash.css">
+	</head>
+	<body>
+		<div ng-app="makerApp" ng-controller="makerController">
+			<nav class="navbar navbar-inverse navbar-fixed-top">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<label class="brand_label">Box Office Success Predictor</label>
+					</div>
+					<div id="navbar" class="navbar-collapse collapse">
+						<div class="navbar-right">
+							<ul class="ul_style">
+								<li><label><h4>Hello {{userMail}}</h4></label></li>
+								<li><a href="/userDashBoard" class="link_style">User Dashboard</a></li>
+								<li><a href="/logout" class="link_style"><span class="glyphicon glyphicon-user"></span> Sign Out</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</nav>
+			<div class="container options">
+				<div class="pull-right">
+					<button class="btn btn-success btn-lg" data-toggle="modal" data-target="#addMovie"><span class="glyphicon glyphicon-plus"></span>Add Movies</button>
+					<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#findMovie"><span class="glyphicon glyphicon-search"></span>Find Movies</button>
+					<button class="btn btn-danger btn-lg" ng-click="reset()"><span class="glyphicon glyphicon-delete"></span>Reset</button>
+				</div>
+			</div>
+			<!-- Modal -->
+			<div id="trailerModal" class="modal fade" role="dialog">
+			  	<div class="modal-dialog">
+			    	<!-- Modal content-->
+			    	<div class="modal-content">
+				      	<div class="modal-header">
+				        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+				        	<h1 class="modal-title alertColor text-center">Watch Trailer</h1>
+				      	</div>
+				      	<div class="modal-body">
+				      		 <iframe id="trailerVideo" width="560" height="315" ng-src="{{trustSrc()}}" frameborder="0" allowfullscreen></iframe>
+				      	</div>
+			    	</div>
+			  	</div>
+			</div>
+			<div id="findMovie" class="modal fade" role="dialog">
+			  	<div class="modal-dialog">
+			    	<!-- Modal content-->
+			    	<div class="modal-content">
+				      	<div class="modal-header">
+				        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+				        	<h1 class="modal-title alertColor text-center">Find Movies</h1>
+				      	</div>
+				      	<div class="modal-body">
+				      		<form name="findMovieForm"> 
+								<div class="row">
+									<div class="form-group">
+										<div class="col-md-2">
+											<label for="movieTitleFind" class="col-md-3 col-form-label">Movie<span class="alertColor asterisk">*</span></label>
+										</div>
+										<div class="col-md-10">
+											<input class="form-control" type="text" placeholder="Enter Movie Name" id="movieTitleFind" ng-model="movie_name_find" name="movie_name_find" required autofocus>
+										</div>
+									</div>
+								</div>
+							</form>
+				      	</div>
+				      	<div class="modal-footer">
+				        	<button type="button" ng-click="findMovie()" class="btn btn-primary" ng-disabled="findMovieForm.$invalid">
+				        		<span class="glyphicon glyphicon-save"></span>Submit</button>
+							<button type="button" class="btn btn-danger" ng-click="clearFind()">
+								<span class="glyphicon glyphicon-remove"></span>Clear</button>
+				      	</div>
+			    	</div>
+			  	</div>
+			</div>
+			<!-- Modal -->
+			<div id="addMovie" class="modal fade" role="dialog">
+			  	<div class="modal-dialog modal-lg">
+			    	<!-- Modal content-->
+			    	<div class="modal-content">
+				      	<div class="modal-header">
+				        	<button type="button" class="close" data-dismiss="modal" ng-click="clearAdd()">&times;</button>
+				        	<h1 class="modal-title alertColor text-center">Add Movies</h1>
+				      	</div>
+				      	<div class="modal-body">
+					        <form name="addMovieForm"> 
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-group row">
+											<label for="movieTitle" class="col-md-3 col-form-label">Movie<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Movie Name" id="movieTitle" ng-model="movie_name" name="movie_name" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieYear" class="col-md-3 col-form-label">Year<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="number" min="2000" placeholder="Enter Year of Release" id="movieYear" ng-model="movie_year" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieMonth" class="col-md-3 col-form-label">Month<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="number" min="1" max="12" placeholder="Enter Month of Release" id="movieMonth" ng-model="movie_month" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieSummary" class="col-md-3 col-form-label">Summary<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<textarea class="form-control" rows="6" placeholder="Enter Movie Overview" id="movieSummary" ng-model="movie_summary" required></textarea>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieGenre" class="col-md-3 col-form-label">Genre<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Genre" id="movieGenre" ng-model="movie_genre" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="actor1" class="col-md-3 col-form-label">Actor 1<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor1" ng-model="movie_actor1" required>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6">	
+										<div class="form-group row">
+											<label for="actor2" class="col-md-3 col-form-label">Actor 2</label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor2" ng-model="movie_actor2">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="actor3" class="col-md-3 col-form-label">Actor 3</label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor3" ng-model="movie_actor3">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="dir" class="col-md-3 col-form-label">Director<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Director Name" id="dir" ng-model="movie_director" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="prod" class="col-md-3 col-form-label">Producer</label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Producer Name" id="prod" ng-model="movie_producer">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieBudget" class="col-md-3 col-form-label">Budget<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="number" min="10000" placeholder="Enter Budget in $" id="movieBudget" ng-model="movie_budget" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="language" class="col-md-3 col-form-label">Language<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Language" id="language" ng-model="movie_language" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="poster_path" class="col-md-3 col-form-label">Poster Path<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Poster link" id="poster_path" ng-model="movie_poster" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="trailer_path" class="col-md-3 col-form-label">Trailer Path</label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Trailer link" id="trailer_path" ng-model="movie_trailer">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="alertColor text-center">
+										<label>{{errorMsg}}</label>
+									</div>
+								</div>
+							</form>
+				      	</div>
+				      	<div class="modal-footer">
+				        	<button type="button" ng-click="addMovie()" class="btn btn-primary" ng-disabled="addMovieForm.$invalid">
+				        		<span class="glyphicon glyphicon-save"></span>Save</button>
+							<button type="button" class="btn btn-danger" ng-click="clearAdd()">
+								<span class="glyphicon glyphicon-remove"></span>Clear</button>
+				      	</div>
+			    	</div>
+			  	</div>
+			</div>
+			<div id="editMovie" class="modal fade" role="dialog">
+			  	<div class="modal-dialog modal-lg">
+			    	<!-- Modal content-->
+			    	<div class="modal-content">
+				      	<div class="modal-header">
+				        	<button type="button" class="close" data-dismiss="modal" ng-click="clearEdit()">&times;</button>
+				        	<h1 class="modal-title alertColor text-center">Edit Movies</h1>
+				      	</div>
+				      	<div class="modal-body">
+					        <form name="editMovieForm"> 
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-group row">
+											<label for="movieTitleEdit" class="col-md-3 col-form-label">Movie<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Movie Name" id="movieTitleEdit" ng-model="movie_name_edit" name="movie_name_edit" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieYearEdit" class="col-md-3 col-form-label">Year<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="number" min="2000" placeholder="Enter Year of Release" id="movieYearEdit" ng-model="movie_year_edit" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieMonthEdit" class="col-md-3 col-form-label">Month<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="number" min="1" max="12" placeholder="Enter Month of Release" id="movieMonthEdit" ng-model="movie_month_edit" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieSummaryEdit" class="col-md-3 col-form-label">Summary<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<textarea class="form-control" rows="6" placeholder="Enter Movie Overview" id="movieSummaryEdit" ng-model="movie_summary_edit" required></textarea>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieGenreEdit" class="col-md-3 col-form-label">Genre<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Genre" id="movieGenreEdit" ng-model="movie_genre_edit" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="actor1Edit" class="col-md-3 col-form-label">Actor 1<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor1Edit" ng-model="movie_actor1_edit" required>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6">	
+										<div class="form-group row">
+											<label for="actor2Edit" class="col-md-3 col-form-label">Actor 2</label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor2Edit" ng-model="movie_actor2_edit">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="actor3Edit" class="col-md-3 col-form-label">Actor 3</label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Actor Name" id="actor3Edit" ng-model="movie_actor3_edit">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="dirEdit" class="col-md-3 col-form-label">Director<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Director Name" id="dirEdit" ng-model="movie_director_edit" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="prodEdit" class="col-md-3 col-form-label">Producer</label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Producer Name" id="prodEdit" ng-model="movie_producer_edit">
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="movieBudgetEdit" class="col-md-3 col-form-label">Budget<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="number" min="10000" placeholder="Enter Budget in $" id="movieBudgetEdit" ng-model="movie_budget_edit" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="languageEdit" class="col-md-3 col-form-label">Language<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Language" id="language" ng-model="movie_language_edit" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="poster_pathEdit" class="col-md-3 col-form-label">Poster Path<span class="alertColor asterisk">*</span></label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Poster link" id="poster_pathEdit" ng-model="movie_poster_edit" required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="trailer_pathEdit" class="col-md-3 col-form-label">Trailer Path</label>
+											<div class="col-md-9">
+												<input class="form-control" type="text" placeholder="Enter Trailer link" id="trailer_pathEdit" ng-model="movie_trailer_edit">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="alertColor text-center">
+										<label>{{errorMsgEdit}}</label>
+									</div>
+								</div>
+							</form>
+				      	</div>
+				      	<div class="modal-footer">
+				        	<button type="button" ng-click="updateMovie()" class="btn btn-primary" ng-disabled="editMovieForm.$invalid">
+				        		<span class="glyphicon glyphicon-save"></span>Save</button>
+							<button type="button" class="btn btn-danger" ng-click="clearEdit()">
+								<span class="glyphicon glyphicon-remove"></span>Clear</button>
+				      	</div>
+			    	</div>
+			  	</div>
+			</div>
+			<div class="container dash">
+				<section>
+					<div class="alertColor text-center asterisk">
+						<label>{{norecord}}</label>
+					</div>
+					<table class="table">
+						<tbody>
+							<tr ng-repeat="movie in movies">
+								<td class="col-md-3">
+									<div class="image">
+										<img height="320" width="210" alt="{{movie.movie}}" title="{{movie.movie + movie.year}}" ng-src="{{movie.poster}}">
+									</div>
+								</td>
+								<td class="col-md-9">
+									<div class="row nameStyle">
+										<label>
+											<h1>{{movie.movie}} ({{movie.year}})</h1>
+										</label>
+										<a href="#trailerModal" class="btn btn-lg btn-info pull-right btn-style" data-toggle="modal" ng-disabled="movie.trailerLink.length === 0" ng-click="trailer(movie.trailerLink)"><span class="glyphicon glyphicon-film" ></span>&nbsp;Trailer</a>
+										<button type="button" class="btn btn-danger btn-lg pull-right btn-style" ng-click="deleteMovieById(movie._id)"> <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete</button>
+										<button type="button" class="btn btn-primary btn-lg pull-right btn-style" data-toggle="modal" ng-click="editMovieById(movie._id)" data-target="#editMovie"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit</button>
+
+									</div>
+
+									<div class="row genreStyle">
+										<label>
+											<h4><em>{{movie.genre}}</em></h4>
+										</label>
+									</div>
+									<div class="row summaryStyle">
+										<p>{{movie.summary}}</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Director : </strong>
+											<span class="summaryStyle">{{movie.director}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Producer : </strong>
+											<span class="summaryStyle">{{movie.producer}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Stars : </strong>
+											<span class="summaryStyle">{{movie.actor1}}, {{movie.actor2}}, {{movie.actor3}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Language : </strong>
+											<span class="summaryStyle">{{movie.language}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Budget : </strong>
+											<span class="summaryStyle">${{movie.budget}}</span>
+										</p>
+										<button class="btn btn-warning btn-lg pull-right btn-style" ng-click="getAnalytics(movie.movie)"><span class="glyphicon glyphicon-eye-open"></span>&nbsp; Analytics</button>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+			</div>
+			<footer class="footer">
+				<div class="container">
+					<div class="bottom-footer">
+						<ul class="footer-nav">
+							<li>Box Office © 2016</li>
+							<li><a href="/userDashBoard">User Dashboard</a></li>
+						</ul>
+					</div>
+				</div>
+			</footer>
+		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+		<script type="text/javascript" src="bootstrap3/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			angular.module('makerApp', [])
+	  			.controller('makerController', function($scope, $http, $sce) {
+	  				function load(){
+	  					$http({
+	                		method: 'get',
+	                		url: '/getmovieDataForMaker'
+	                	}).success(function(response){
+	                		if(response.statusOfMovieMaker === "error"){
+	                			$scope.errorMsg = response.errors;
+	                		}
+	                		else if(response.statusOfMovieMaker === "nodata"){
+	                			$scope.errorMsg = "No Data Found";
+	                		}
+	                		else{
+	                			$scope.userMail = response.email;
+	                			$scope.movies = response.documents;
+	                		}
+	                	}).error(function(error){
+	                		console.log(error);
+	                	});
+		  			}
+		  			load();
+		  			$scope.addMovie = function(){
+	  					var data = {
+	  						movie: $scope.movie_name,
+	  						year: $scope.movie_year,
+	  						month: $scope.movie_month,
+	  						summary: $scope.movie_summary,
+	  						genre: $scope.movie_genre,
+	  						actor1: $scope.movie_actor1,
+	  						actor2: $scope.movie_actor2,
+	  						actor3: $scope.movie_actor3,
+	  						director: $scope.movie_director,
+	  						producer: $scope.movie_producer,
+	  						budget: $scope.movie_budget,
+	  						language: $scope.movie_language,
+	  						poster: $scope.movie_poster,
+	  						trailerLink: $scope.movie_trailer
+	  					};
+	  					$http({
+	                		method: 'POST',
+	                		url: '/addmovie',
+	                		data: data
+	                	}).success(function(response){
+	                		if(response.regstatus === "error"){
+	                			$scope.errorMsg = response.errors;
+	                		}
+	                		else{
+	                			$scope.clearAdd();
+	                			$('#addMovie').modal('hide');
+	                			$scope.userMail = response.email;
+	                			load();
+	                		}
+	                	}).error(function(error){
+	                		console.log(error);
+	                	});	
+	  				}
+
+	  				$scope.deleteMovieById = function(id){
+	  					$http.get('/deleteMovieById/' + id).success(function(response){
+	  						if(response.returnstatus === "error"){
+	  							$scope.errorMsg = response.errors;
+	  						}
+	  						else{
+	  							load();
+	  						}
+	  					}).error(function(error){
+	                		console.log(error);
+	                	});	
+	  				}
+
+	  				$scope.editMovieById = function(id){
+	  					$scope.movieId = id;
+	  					$http.get('/editMovieById/' + id).success(function(response){
+	  						if(response.returnstatus === "error"){
+	  							$scope.errorMsg = response.errors;
+	  						}
+	  						else{
+	  							var res = response.doc;
+	  							console.log(res);
+	  							$scope.movie_name_edit = res.movie;
+								$scope.movie_year_edit = res.year;
+								$scope.movie_month_edit = res.month;
+								$scope.movie_summary_edit = res.summary;
+								$scope.movie_genre_edit = res.genre;
+								$scope.movie_actor1_edit = res.actor1;
+								$scope.movie_actor2_edit = res.actor2;
+								$scope.movie_actor3_edit = res.actor3;
+								$scope.movie_director_edit = res.director;
+								$scope.movie_producer_edit = res.producer;
+								$scope.movie_budget_edit = res.budget;
+								$scope.movie_language_edit = res.language;
+			  					$scope.movie_poster_edit = res.poster;
+			  					$scope.movie_trailer_edit = res.trailerLink;
+	  						}
+	  					}).error(function(error){
+	                		console.log(error);
+	                	});	
+	  				}
+
+	  				$scope.updateMovie = function(){
+	  					$scope.movieId
+	  					var data = {
+	  						movie: $scope.movie_name_edit,
+	  						year: $scope.movie_year_edit,
+	  						month: $scope.movie_month_edit,
+	  						summary: $scope.movie_summary_edit,
+	  						genre: $scope.movie_genre_edit,
+	  						actor1: $scope.movie_actor1_edit,
+	  						actor2: $scope.movie_actor2_edit,
+	  						actor3: $scope.movie_actor3_edit,
+	  						director: $scope.movie_director_edit,
+	  						producer: $scope.movie_producer_edit,
+	  						budget: $scope.movie_budget_edit,
+	  						language: $scope.movie_language_edit,
+	  						poster: $scope.movie_poster_edit,
+	  						trailerLink: $scope.movie_trailer_edit
+	  					};
+	  					$http.post('/updateMovie/' + $scope.movieId, data).success(function(response){
+	                		if(response.regstatus === "error"){
+	                			$scope.errorMsg = response.errors;
+	                		}
+	                		else{
+	                			$scope.clearEdit();
+	                			$('#editMovie').modal('hide');
+	                			$scope.userMail = response.email;
+	                			load();
+	                		}
+	                	}).error(function(error){
+	                		console.log(error);
+	                	});	
+	  				}
+
+	  				$scope.trailer = function(trailerLink){
+		  				$scope.trailerSrc = "http://www.youtube.com/embed/" + getYoutubeId(trailerLink);
+		  				console.log($scope.trailerSrc);
+		  			} 
+
+		  			$scope.trustSrc = function() {
+		  				console.log($scope.trailerSrc);
+					    return $sce.trustAsResourceUrl($scope.trailerSrc);
+					}
+
+			  		$("#trailerModal").on('hide.bs.modal', function(){
+						$("#trailerVideo").attr('src', '');
+					});
+					$("#trailerModal").on('show.bs.modal', function(){
+					    $("#trailerVideo").attr('src', $scope.trailerSrc);
+					});
+
+					$("#findMovie").on('show.bs.modal', function(){
+					    $('#movieTitleFind').focus()
+					});
+
+					function getYoutubeId(link){
+						var index = link.indexOf('=');
+						return link.slice(index+1);
+					}
+
+					$scope.clearFind = function(){
+						$scope.movie_name_find = "";
+					}
+
+					$scope.findMovie = function(){
+						//$scope.findMovie();
+						$http.get('/findMovieByNameMovieMaker/' + $scope.movie_name_find).success(function(response){
+							if(response.returnstatus == "error"){
+		  						console.log(response.errors);
+		  					}else if(response.doc.length === 0){
+		  						$scope.norecord = "No records found";
+		  						$scope.clearFind();
+	                			$('#findMovie').modal('hide');
+		  						$scope.movies = response.doc;
+		  					}else{
+		  						$scope.clearFind();
+		  						$scope.norecord = "";
+	                			$('#findMovie').modal('hide');
+	                			$scope.movies = response.doc;
+	                		}
+						}).error(function(error){
+		  					console.log(error);
+		  				});
+					}
+					/*var movieList = {};
+					$scope.findMovie = function(){
+						$http.get('/findMovie').success(function(response){
+							var len = response.doc.length;
+							var doc = response.doc;
+							for(var i = 0; i < len; i++){
+								doc.original_title = doc.original_title.toLowerCase();
+							}
+						}).error(function(error){
+		  					console.log(error);
+		  				});
+					}*/
+
+					$scope.getAnalytics = function(movieName){
+						console.log(movieName);
+						$http.get('/getAnalyticsByName/' + movieName).success(function(response){
+							if(response.resp == "success"){
+		  						window.location = '/analytics';
+		  					} else{
+		  						console.log("error");
+		  					}
+						}).error(function(error){
+		  					console.log(error);
+		  				});
+					}
+
+					$scope.reset = function(){
+						load();
+						$scope.norecord = "";
+					}
+
+		  			$scope.clearAdd = function(){
+	  					$scope.movie_name = "";
+						$scope.movie_year = "";
+						$scope.movie_month = "";
+						$scope.movie_summary = "";
+						$scope.movie_genre = "";
+						$scope.movie_actor1 = "";
+						$scope.movie_actor2 = "";
+						$scope.movie_actor3 = "";
+						$scope.movie_director = "";
+						$scope.movie_producer = "";
+						$scope.movie_budget = "";
+						$scope.movie_language = "";
+	  					$scope.movie_poster = "";
+	  					$scope.movie_trailer = "";	
+	  				}
+	  				$scope.clearEdit = function(){
+	  					$scope.movie_name_edit = "";
+						$scope.movie_year_edit = "";
+						$scope.movie_month_edit = "";
+						$scope.movie_summary_edit = "";
+						$scope.movie_genre_edit = "";
+						$scope.movie_actor1_edit = "";
+						$scope.movie_actor2_edit = "";
+						$scope.movie_actor3_edit = "";
+						$scope.movie_director_edit = "";
+						$scope.movie_producer_edit = "";
+						$scope.movie_budget_edit = "";
+						$scope.movie_language_edit = "";
+	  					$scope.movie_poster_edit = "";
+	  					$scope.movie_trailer_edit = "";	
+	  				}
+	  			});
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,32 @@
+body {
+  padding: 80px 10px 10px 10px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.container{
+    position:relative;
+}
+
+.textColor{
+	color:white;
+}
+
+a:hover{
+	color:white;
+	text-decoration:none;
+}
+
+.brand_label{
+	margin-top:10px;
+	color:white;
+	font-size:20px;
+	font-family:"Comic Sans MS", cursive, sans-serif
+}
+
+.alertColor{
+	color:red;
+}
+
+.asterisk{
+	font-size: x-large; 
+}

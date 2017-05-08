@@ -1,0 +1,89 @@
+.ul_style li{
+	display: inline;
+	color: white;
+}
+
+.ul_style li:not(:first-child):before
+{	
+ content: '|';
+ padding: 0px 10px;
+}
+
+.ul_style{
+	margin-top:13px;
+}
+.link_style{
+	color:white;
+	font-size:15px;
+}
+
+.link_style:hover{
+	color:white;
+}
+
+.brand_label{
+	margin-top:20px;
+	color:white;
+	font-size:20px;
+	font-family:"Comic Sans MS", cursive, sans-serif
+}
+
+.brand{
+	margin-top:8px !important;
+}
+
+.dash{
+	background-color: #f2f2f2;
+	padding:60px;
+	margin-top:-25px;
+}
+
+.options{
+	margin-top:30px;
+	padding:60px;
+}
+
+.genreStyle{
+	margin-top:-10px;
+}
+
+.nameStyle{
+	color:#33AFFF;
+}
+
+.summaryStyle{
+	color:#666666;
+	font-size:20px;
+}
+
+.paraStyle{
+	font-size:20px;
+}
+
+.image{
+	margin-top:40px;
+}
+
+.alertColor{
+	color: red;
+}
+
+.btn-style{
+	margin-top:15px;
+	margin-right:5px;
+}
+
+#trailer{
+	margin-top : 20px;
+}
+
+.asterisk{
+	font-size: x-large; 
+}
+
+.labelStart{
+	padding-top:80px;
+	padding-bottom:30px;
+}
+
+
