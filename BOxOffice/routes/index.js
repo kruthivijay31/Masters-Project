@@ -149,6 +149,18 @@ router.get('/getMovieMakerDashboard', function(req, res){
 		res.render('login', { title: 'Box Office Success Predictor Login' });
 	}
 });
+//get sentiment analysis results
+router.get('/getSentimentAnalysis', function(req, res) {
+	db.movieDashBoard.find({"movieName":  movieName},function (err,doc) {
+		if(err){
+			res.send({"returnstatus":"error", "errors":err});
+		}
+		else{
+			res.json({"doc" : doc});
+		}
+	});	
+});
+
 
 //get data for movie maker dashboard
 router.get('/getmovieDataForMaker',function(req, res){
