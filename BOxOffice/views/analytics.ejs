@@ -58,6 +58,10 @@
                     <label><h3>User Votes</h3></label>
                     <div id="analyticsContainerUserVote"></div>
                 </div>
+                <div class="row">
+                    <label><h3>YouTube Comments Sentiment Chart</h3></label>
+                    <div id="analyticsContainerYoutubeSenti"></div>
+                </div>
             </div>
             <footer class="footer">
                 <div class="container">
@@ -86,6 +90,9 @@
                     var youTubeArr = [];
                     var youTubeData = {};
                     var userVoteArr = [];
+                    var youTubeDataSenti = {};
+                    var youTubeArrSenti = [];
+
                     var userVoteData = {};
                     function getFbReaction(){
                         $http({
@@ -130,6 +137,27 @@
                         });
                     };
                     getYoutubeData();
+                    
+                    function getYoutubeSentimentStats(){
+                        $http({
+                            method: 'get',
+                            url: '/getSentimentAnalysis'
+                        }).success(function(response){
+                            if(response.returnstatus == "error"){
+                                $scope.movie_name = "Error while getting the page, please try again";
+                            } else if(response.doc.length !== 0){
+                                console.log("Senti"+response.doc[0]);
+                                createDataYouTubeSenti(response.doc[0]);
+                                Plotly.newPlot('analyticsContainerYoutubeSenti', youTubeArrSenti, layout);
+                            }else{
+                                document.getElementById("analyticsContainerYoutubeSenti").innerHTML = "No data found";
+                            }
+                        }).error(function(error){
+                          console.log(error);
+                        });
+                    };
+                    getYoutubeSentimentStats();
+                    
 
 
                     function createDataFb(data){
@@ -148,6 +176,14 @@
                         youTubeData.labels = labelArr;
                         youTubeData.type ='pie';
                         youTubeArr.push(youTubeData);
+                    }
+                     function createDataYouTubeSenti(data){
+                        var valueArr = [data.pos, data.neg, data.neu];
+                        var labelArr = ["Positive", "Negative", "Neutral"];
+                        youTubeDataSenti.values = valueArr;
+                        youTubeDataSenti.labels = labelArr;
+                        youTubeDataSenti.type ='pie';
+                        youTubeArrSenti.push(youTubeDataSenti);
                     }
 
                     function getUserVote(){
